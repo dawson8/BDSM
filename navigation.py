@@ -3,16 +3,15 @@ from functools import partial
 
 
 class Navigation(customtkinter.CTkFrame):
-    def __init__(self, parent):
-        customtkinter.CTkFrame.__init__(self, parent, corner_radius=0)
+    def __init__(self, parent, pages):
+        super().__init__(parent, corner_radius=0)
 
         self.parent = parent
 
-        self.grid_rowconfigure(8, weight=1)
+        self.grid_rowconfigure(len(pages), weight=1)
 
         self.button_list = []
-
-        pages = ("Dashboard", "Console", "Settings")
+        self.selected_button = None
 
         for index, page in enumerate(pages):
             button = customtkinter.CTkButton(
@@ -25,28 +24,24 @@ class Navigation(customtkinter.CTkFrame):
                 text_color=("gray10", "gray90"),
                 hover_color=("gray70", "gray30"),
                 anchor="w",
-                command=partial(self.button_event, index),
+                command=partial(self.button_event, page),
             )
             button.grid(row=index, column=0, sticky="ew")
 
             self.button_list.append(button)
 
-        customtkinter.CTkButton(
-            self,
-            text="Create",
-            command=self.create_button_event,
-        ).grid(row=index + 1, column=0, padx=20, pady=20)
-
         # highlight first button
-        self.button_list[0].configure(fg_color=("gray75", "gray25"))
+        self.select_button(self.button_list[0])
 
-    def button_event(self, index):
-        button = self.button_list[index]
-        for b in self.button_list:
-            b.configure(fg_color=("gray75", "gray25") if b == button else "transparent")
+    def button_event(self, page_name):
+        for button in self.button_list:
+            if button.cget("text") == page_name:
+                self.select_button(button)
+                self.parent.show_frame(page_name)
+                break
 
-        self.parent.show_frame(button.cget("text"))
-
-    def create_button_event(self):
-        print("CREATE")
-        self.parent.show_create_server_page()
+    def select_button(self, button):
+        if self.selected_button:
+            self.selected_button.configure(fg_color="transparent")
+        button.configure(fg_color=("gray75", "gray25"))
+        self.selected_button = button
