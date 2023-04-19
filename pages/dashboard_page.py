@@ -3,9 +3,7 @@ import customtkinter
 
 class Dashboard(customtkinter.CTkFrame):
     def __init__(self, parent):
-        customtkinter.CTkFrame.__init__(
-            self, parent, fg_color="transparent", corner_radius=0
-        )
+        super().__init__(parent, fg_color="transparent", corner_radius=0)
         self.parent = parent
 
         self.grid_rowconfigure(0, weight=1)
@@ -41,7 +39,7 @@ class Dashboard(customtkinter.CTkFrame):
 
     def update_status(self):
         status = self.parent.server.get_status()
-        self.status_label.configure(text="Server status: {}".format(status))
+        self.status_label.configure(text=f"Server status: {status}")
         self.after(1000, self.update_status)
 
     def start_server(self):
@@ -59,3 +57,7 @@ class Dashboard(customtkinter.CTkFrame):
     def backup_server(self):
         backup_path = self.parent.server.backup_server("server_backup.tar.gz")
         self.write_output(f"Backup saved to {backup_path}")
+
+    def write_output(self, text):
+        # self.parent.console.write(text)
+        print(text)
